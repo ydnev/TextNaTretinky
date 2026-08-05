@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Tisk na třetiny A4 - Chytré formátování</title>
+    <style>
+        body {
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* FIXNÍ PANEL S TLAČÍTKY NA LEVÉ STRANĚ */
+        .sidebar {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            width: 200px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .main-print-btn {
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .main-print-btn:hover { background-color: #218838; }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 8px 4px;
+            font-size: 12px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .btn-grow { background-color: #007bff; }
+        .btn-grow:hover { background-color: #0056b3; }
+
+        .btn-shrink { background-color: #dc3545; }
+        .btn-shrink:hover { background-color: #c82333; }
+
+
+        /* PAPÍR A4 (Uprostřed obrazovky) */
+        .page-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            margin-left: 240px;
+        }
+
+        .a4-page {
+            width: 595.27pt;
+            height: 841.89pt;
+            background: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .third {
+            height: 280.63pt;
+            box-sizing: border-box;
+            border-bottom: 1px dashed #bbb;
+            padding: 15pt;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .third:last-child {
+            border-bottom: none;
+        }
+
+        /* Hlavní stylování textu */
+        .content {
+            width: 100%;
+            max-height: 100%;
+            outline: none;
+            text-align: center;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.3;
+        }
+
+        /* KLÍČOVÉ PRAVIDLO: Všechny vnořené elementy (span, strong, p...)
+           přinutíme dědit velikost písma a font z hlavní třetiny.
+           Pokud vložený text obsahuje cizí inline font-size, toto pravidlo ho přebije. */
+        .content * {
+            font-size: inherit !important;
+            font-family: inherit !important;
+        }
+
+        /* PRAVIDLA PRO TISK */
+        @media print {
+            body { background: none; padding: 0; }
+            .sidebar { display: none !important; }
+            .page-container { margin: 0; }
+            .a4-page {
+                box-shadow: none;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+            .third { border-bottom: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Levý ovládací panel -->
+    <div class="sidebar">
+        <button class="main-print-btn" onclick="window.print()">Vytisknout / PDF</button>
+        <hr style="border: 0; border-top: 1px solid #eee; width: 100%;">
+        
+        <div class="control-group">
+            <span class="control-label">1. třetina (Nahoře)</span>
+            <div class="btn-row">
+                <button class="action-btn btn-grow" onclick="changeSize('txt-1', 1)">➕ Zvětšit</button>
+                <button class="action-btn btn-shrink" onclick="changeSize('txt-1', -1)">➖ Zmenšit</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">2. třetina (Uprostřed)</span>
+            <div class="btn-row">
+                <button class="action-btn btn-grow" onclick="changeSize('txt-2', 1)">➕ Zvětšit</button>
+                <button class="action-btn btn-shrink" onclick="changeSize('txt-2', -1)">➖ Zmenšit</button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <span class="control-label">3. třetina (Dole)</span>
+            <div class="btn-row">
+                <button class="action-btn btn-grow" onclick="changeSize('txt-3', 4)">➕ Zvětšit</button>
+                <button class="action-btn btn-shrink" onclick="changeSize('txt-3', -4)">➖ Zmenšit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Papír A4 -->
+    <div class="page-container">
+        <div class="a4-page">
+            <div class="third">
+                <!-- Změněno zpět na klasické true, aby fungovalo bohaté HTML formátování -->
+                <div id="txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changeSize(elementId, amount) {
+            const contentElement = document.getElementById(elementId);
+            let currentSize = parseInt(contentElement.style.fontSize, 10);
+
+            currentSize += amount;
+
+            if (currentSize < 6) currentSize = 6;
+            if (currentSize > 120) currentSize = 120;
+
+            contentElement.style.fontSize = currentSize + 'pt';
+        }
+
+        // CHYTRÝ INTEGRÁTOR SCHRÁNKY: Zachová tagy, ale vyčistí velikosti písem
+        document.querySelectorAll('.content').forEach(element => {
+            element.addEventListener('paste', function(e) {
+                e.preventDefault(); // Stop standardnímu vložení
+
+                // Zkusíme vytáhnout formátované HTML, pokud neexistuje, vezmeme prostý text
+                let html = (e.clipboardData || window.clipboardData).getData('text/html');
+                
+                if (!html) {
+                    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+                    document.execCommand('insertText', false, text);
+                    return;
+                }
+
+                // Vytvoříme virtuální DOM element pro pročištění HTML kódu
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+
+                // Najdeme všechny vnořené elementy uvnitř vkládaného textu a smažeme jim inline velikosti a fonty
+                const allElements = tempDiv.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.fontSize = ''; // Odstraní inline nastavení velikosti
+                    el.style.fontFamily = ''; // Odstraní inline nastavení fontu
+                    el.style.lineHeight = ''; // Odstraní případné řádkování
+                });
+
+                // Vložíme pročištěné HTML (které si zachovalo <strong>, <em>, <ul>, atd.) na pozici kurzoru
+                document.execCommand('insertHTML', false, tempDiv.innerHTML);
+            });
+        });
+    </script>
+
+</body>
+</html>
