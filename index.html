@@ -78,6 +78,17 @@
         .btn-shrink { background-color: #dc3545; }
         .btn-shrink:hover { background-color: #c82333; }
 
+        .print-hint {
+            font-size: 11px;
+            color: #555;
+            background: #fff8e1;
+            border: 1px solid #ffe0a3;
+            border-radius: 4px;
+            padding: 8px;
+            line-height: 1.4;
+        }
+
+        .print-hint b { color: #7a5b00; }
 
         /* PAPÍR A4 (Uprostřed obrazovky) */
         .page-container {
@@ -131,6 +142,11 @@
         }
 
         /* PRAVIDLA PRO TISK */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
         @media print {
             body { background: none; padding: 0; }
             .sidebar { display: none !important; }
@@ -143,7 +159,15 @@
                 top: 0;
                 left: 0;
             }
-            .third { border-bottom: none; }
+            /* Čáry mezi třetinami se nyní PONECHÁVAJÍ i v tisku */
+            .third {
+                border-bottom: 1px dashed #bbb;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .third:last-child {
+                border-bottom: none;
+            }
         }
     </style>
 </head>
@@ -173,9 +197,15 @@
         <div class="control-group">
             <span class="control-label">3. třetina (Dole)</span>
             <div class="btn-row">
-                <button class="action-btn btn-grow" onclick="changeSize('txt-3', 4)">➕ Zvětšit</button>
-                <button class="action-btn btn-shrink" onclick="changeSize('txt-3', -4)">➖ Zmenšit</button>
+                <button class="action-btn btn-grow" onclick="changeSize('txt-3', 1)">➕ Zvětšit</button>
+                <button class="action-btn btn-shrink" onclick="changeSize('txt-3', -1)">➖ Zmenšit</button>
             </div>
+        </div>
+
+        <div class="print-hint">
+            <b>Tip:</b> Adresu / datum v záhlaví a zápatí vypnete v tiskovém okně přepínačem
+            "Záhlaví a zápatí" (obvykle v sekci "Další nastavení"). Prohlížeč si tuto volbu
+            zpravidla zapamatuje i pro příště.
         </div>
     </div>
 
@@ -208,6 +238,36 @@
             contentElement.style.fontSize = currentSize + 'pt';
         }
 
+        // Odstraní mezery/zalomení řádků na úplném začátku a konci obsahu daného
+        // elementu (uvnitř textu je nechává beze změny). Prázdné textové uzly
+        // na okrajích úplně smaže, aby po nich nezůstávaly "díry".
+        function trimEdgesWhitespace(container) {
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+            const textNodes = [];
+            let node;
+            while ((node = walker.nextNode())) textNodes.push(node);
+
+            // Začátek
+            for (const n of textNodes) {
+                const trimmed = n.nodeValue.replace(/^[\s\u00A0]+/, '');
+                if (trimmed === n.nodeValue) break; // na začátku uzlu nebyla mezera -> konec
+                n.nodeValue = trimmed;
+                if (n.nodeValue.length > 0) break; // v uzlu zbyl text -> hotovo
+                // jinak byl uzel čistě z mezer -> smažeme a jdeme na další
+                n.nodeValue = '';
+            }
+
+            // Konec (od posledního uzlu zpět)
+            for (let i = textNodes.length - 1; i >= 0; i--) {
+                const n = textNodes[i];
+                const trimmed = n.nodeValue.replace(/[\s\u00A0]+$/, '');
+                if (trimmed === n.nodeValue) break;
+                n.nodeValue = trimmed;
+                if (n.nodeValue.length > 0) break;
+                n.nodeValue = '';
+            }
+        }
+
         // CHYTRÝ INTEGRÁTOR SCHRÁNKY: Zachová tagy, ale vyčistí velikosti písem
         document.querySelectorAll('.content').forEach(element => {
             element.addEventListener('paste', function(e) {
@@ -218,7 +278,7 @@
                 
                 if (!html) {
                     const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-                    document.execCommand('insertText', false, text);
+                    document.execCommand('insertText', false, text.trim());
                     return;
                 }
 
@@ -233,6 +293,9 @@
                     el.style.fontFamily = ''; // Odstraní inline nastavení fontu
                     el.style.lineHeight = ''; // Odstraní případné řádkování
                 });
+
+                // Ořízneme mezery/zalomení na začátku a konci vkládaného obsahu
+                trimEdgesWhitespace(tempDiv);
 
                 // Vložíme pročištěné HTML (které si zachovalo <strong>, <em>, <ul>, atd.) na pozici kurzoru
                 document.execCommand('insertHTML', false, tempDiv.innerHTML);
