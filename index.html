@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="cs">
+
 <head>
     <meta charset="UTF-8">
     <title>Tisk na třetiny A4 - Chytré formátování</title>
@@ -23,7 +24,7 @@
             background: white;
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -41,7 +42,9 @@
             cursor: pointer;
         }
 
-        .main-print-btn:hover { background-color: #218838; }
+        .main-print-btn:hover {
+            background-color: #218838;
+        }
 
         .control-group {
             display: flex;
@@ -72,11 +75,21 @@
             text-align: center;
         }
 
-        .btn-grow { background-color: #007bff; }
-        .btn-grow:hover { background-color: #0056b3; }
+        .btn-grow {
+            background-color: #007bff;
+        }
 
-        .btn-shrink { background-color: #dc3545; }
-        .btn-shrink:hover { background-color: #c82333; }
+        .btn-grow:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-shrink {
+            background-color: #dc3545;
+        }
+
+        .btn-shrink:hover {
+            background-color: #c82333;
+        }
 
         .print-hint {
             font-size: 11px;
@@ -88,7 +101,9 @@
             line-height: 1.4;
         }
 
-        .print-hint b { color: #7a5b00; }
+        .print-hint b {
+            color: #7a5b00;
+        }
 
         /* PAPÍR A4 (Uprostřed obrazovky) */
         .page-container {
@@ -101,7 +116,7 @@
             width: 595.27pt;
             height: 841.89pt;
             background: white;
-            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
@@ -115,16 +130,32 @@
         .third {
             height: 280.63pt;
             box-sizing: border-box;
-            border-bottom: 1px dashed #bbb;
-            padding: 15pt;
+            position: relative;
+            padding: 0.9cm 1cm;
             display: flex;
             align-items: flex-start;
             justify-content: center;
             overflow: hidden;
         }
 
-        .third:last-child {
-            border-bottom: none;
+        .third::before {
+            content: '';
+            position: absolute;
+            left: 0.5cm;
+            right: 0.5cm;
+            top: 0.25cm;
+            bottom: 0.25cm;
+            border: 1px dashed #bbb;
+            pointer-events: none;
+            /* aby to neblokovalo klikání/psaní do textu */
+        }
+
+        .third:first-child::before {
+            top: 0.5cm;
+        }
+
+        .third:last-child::before {
+            bottom: 0.5cm;
         }
 
         /* Hlavní stylování textu */
@@ -153,9 +184,19 @@
         }
 
         @media print {
-            body { background: none; padding: 0; }
-            .sidebar { display: none !important; }
-            .page-container { margin: 0; }
+            body {
+                background: none;
+                padding: 0;
+            }
+
+            .sidebar {
+                display: none !important;
+            }
+
+            .page-container {
+                margin: 0;
+            }
+
             .a4-page {
                 box-shadow: none;
                 width: 100%;
@@ -169,25 +210,44 @@
                 page-break-after: auto;
                 break-after: auto;
             }
+
             /* Čáry mezi třetinami se nyní PONECHÁVAJÍ i v tisku */
             .third {
-                border-bottom: 1px dashed #bbb;
+                position: relative;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-            }
-            .third:last-child {
-                border-bottom: none;
+
+                .third::before {
+                    content: '';
+                    position: absolute;
+                    left: 0.5cm;
+                    right: 0.5cm;
+                    top: 0.25cm;
+                    bottom: 0.25cm;
+                    border: 1px dashed #bbb;
+                    pointer-events: none;
+                    /* aby to neblokovalo klikání/psaní do textu */
+                }
+
+                .third:first-child::before {
+                    top: 0.5cm;
+                }
+
+                .third:last-child::before {
+                    bottom: 0.5cm;
+                }
             }
         }
     </style>
 </head>
+
 <body>
 
     <!-- Levý ovládací panel -->
     <div class="sidebar">
         <button class="main-print-btn" onclick="window.print()">Vytisknout / PDF</button>
         <hr style="border: 0; border-top: 1px solid #eee; width: 100%;">
-        
+
         <div class="control-group">
             <span class="control-label" id="active-label">Aktivní pole: list 1, 1. třetina</span>
             <div class="btn-row">
@@ -207,49 +267,61 @@
     <div class="page-container">
         <div class="a4-page">
             <div class="third">
-                <div id="p1-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+                <div id="p1-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní
+                    třetinu...</div>
             </div>
             <div class="third">
-                <div id="p1-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+                <div id="p1-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední
+                    třetinu...</div>
             </div>
             <div class="third">
-                <div id="p1-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
-            </div>
-        </div>
-
-        <div class="a4-page">
-            <div class="third">
-                <div id="p2-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
-            </div>
-            <div class="third">
-                <div id="p2-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
-            </div>
-            <div class="third">
-                <div id="p2-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+                <div id="p1-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní
+                    třetinu...</div>
             </div>
         </div>
 
         <div class="a4-page">
             <div class="third">
-                <div id="p3-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+                <div id="p2-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní
+                    třetinu...</div>
             </div>
             <div class="third">
-                <div id="p3-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+                <div id="p2-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední
+                    třetinu...</div>
             </div>
             <div class="third">
-                <div id="p3-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+                <div id="p2-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní
+                    třetinu...</div>
             </div>
         </div>
 
         <div class="a4-page">
             <div class="third">
-                <div id="p4-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+                <div id="p3-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní
+                    třetinu...</div>
             </div>
             <div class="third">
-                <div id="p4-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+                <div id="p3-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední
+                    třetinu...</div>
             </div>
             <div class="third">
-                <div id="p4-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+                <div id="p3-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní
+                    třetinu...</div>
+            </div>
+        </div>
+
+        <div class="a4-page">
+            <div class="third">
+                <div id="p4-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní
+                    třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p4-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední
+                    třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p4-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní
+                    třetinu...</div>
             </div>
         </div>
     </div>
@@ -324,12 +396,12 @@
 
         // CHYTRÝ INTEGRÁTOR SCHRÁNKY: Zachová tagy, ale vyčistí velikosti písem
         document.querySelectorAll('.content').forEach(element => {
-            element.addEventListener('paste', function(e) {
+            element.addEventListener('paste', function (e) {
                 e.preventDefault(); // Stop standardnímu vložení
 
                 // Zkusíme vytáhnout formátované HTML, pokud neexistuje, vezmeme prostý text
                 let html = (e.clipboardData || window.clipboardData).getData('text/html');
-                
+
                 if (!html) {
                     const text = (e.clipboardData || window.clipboardData).getData('text/plain');
                     document.execCommand('insertText', false, text.trim());
@@ -358,4 +430,5 @@
     </script>
 
 </body>
+
 </html>
