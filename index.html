@@ -105,6 +105,11 @@
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        .a4-page:last-child {
+            margin-bottom: 0;
         }
 
         .third {
@@ -155,9 +160,14 @@
                 box-shadow: none;
                 width: 100%;
                 height: 100%;
-                position: absolute;
-                top: 0;
-                left: 0;
+                margin: 0;
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .a4-page:last-child {
+                page-break-after: auto;
+                break-after: auto;
             }
             /* Čáry mezi třetinami se nyní PONECHÁVAJÍ i v tisku */
             .third {
@@ -179,26 +189,10 @@
         <hr style="border: 0; border-top: 1px solid #eee; width: 100%;">
         
         <div class="control-group">
-            <span class="control-label">1. třetina (Nahoře)</span>
+            <span class="control-label" id="active-label">Aktivní pole: list 1, 1. třetina</span>
             <div class="btn-row">
-                <button class="action-btn btn-grow" onclick="changeSize('txt-1', 1)">➕ Zvětšit</button>
-                <button class="action-btn btn-shrink" onclick="changeSize('txt-1', -1)">➖ Zmenšit</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <span class="control-label">2. třetina (Uprostřed)</span>
-            <div class="btn-row">
-                <button class="action-btn btn-grow" onclick="changeSize('txt-2', 1)">➕ Zvětšit</button>
-                <button class="action-btn btn-shrink" onclick="changeSize('txt-2', -1)">➖ Zmenšit</button>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <span class="control-label">3. třetina (Dole)</span>
-            <div class="btn-row">
-                <button class="action-btn btn-grow" onclick="changeSize('txt-3', 1)">➕ Zvětšit</button>
-                <button class="action-btn btn-shrink" onclick="changeSize('txt-3', -1)">➖ Zmenšit</button>
+                <button class="action-btn btn-grow" onclick="changeActiveSize(1)">➕ Zvětšit</button>
+                <button class="action-btn btn-shrink" onclick="changeActiveSize(-1)">➖ Zmenšit</button>
             </div>
         </div>
 
@@ -209,33 +203,93 @@
         </div>
     </div>
 
-    <!-- Papír A4 -->
+    <!-- Papír A4 (4 listy pod sebou, každý po vytisknutí na samostatné stránce) -->
     <div class="page-container">
         <div class="a4-page">
             <div class="third">
-                <!-- Změněno zpět na klasické true, aby fungovalo bohaté HTML formátování -->
-                <div id="txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+                <div id="p1-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
             </div>
             <div class="third">
-                <div id="txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+                <div id="p1-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
             </div>
             <div class="third">
-                <div id="txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+                <div id="p1-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+            </div>
+        </div>
+
+        <div class="a4-page">
+            <div class="third">
+                <div id="p2-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p2-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p2-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+            </div>
+        </div>
+
+        <div class="a4-page">
+            <div class="third">
+                <div id="p3-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p3-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p3-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
+            </div>
+        </div>
+
+        <div class="a4-page">
+            <div class="third">
+                <div id="p4-txt-1" class="content" contenteditable="true" style="font-size: 24pt;">Text pro horní třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p4-txt-2" class="content" contenteditable="true" style="font-size: 24pt;">Text pro prostřední třetinu...</div>
+            </div>
+            <div class="third">
+                <div id="p4-txt-3" class="content" contenteditable="true" style="font-size: 24pt;">Text pro spodní třetinu...</div>
             </div>
         </div>
     </div>
 
     <script>
-        function changeSize(elementId, amount) {
-            const contentElement = document.getElementById(elementId);
-            let currentSize = parseInt(contentElement.style.fontSize, 10);
+        // Sledování naposledy aktivního (naklikaného) editovatelného pole,
+        // aby tlačítka Zvětšit/Zmenšit vždy věděla, na co mají sáhnout.
+        let activeElement = document.getElementById('p1-txt-1');
+        const activeLabel = document.getElementById('active-label');
+
+        const thirdNames = { 1: '1. třetina (nahoře)', 2: '2. třetina (uprostřed)', 3: '3. třetina (dole)' };
+
+        function updateActiveLabel(el) {
+            const match = el.id.match(/^p(\d+)-txt-(\d+)$/);
+            if (match) {
+                activeLabel.textContent = `Aktivní pole: list ${match[1]}, ${thirdNames[match[2]]}`;
+            }
+        }
+
+        document.querySelectorAll('.content').forEach(el => {
+            el.addEventListener('focus', () => {
+                activeElement = el;
+                updateActiveLabel(el);
+            });
+            el.addEventListener('click', () => {
+                activeElement = el;
+                updateActiveLabel(el);
+            });
+        });
+
+        function changeActiveSize(amount) {
+            if (!activeElement) return;
+            let currentSize = parseInt(activeElement.style.fontSize, 10) || 24;
 
             currentSize += amount;
 
             if (currentSize < 6) currentSize = 6;
             if (currentSize > 120) currentSize = 120;
 
-            contentElement.style.fontSize = currentSize + 'pt';
+            activeElement.style.fontSize = currentSize + 'pt';
         }
 
         // Odstraní mezery/zalomení řádků na úplném začátku a konci obsahu daného
