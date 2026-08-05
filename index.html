@@ -294,6 +294,20 @@
                 document.execCommand('insertHTML', false, tempDiv.innerHTML);
             });
         });
+
+        function clearAllFields() {
+            // Zeptáme se uživatele pro jistotu, aby si text nesmazal omylem
+            if (confirm("Opravdu chcete vymazat texty ze všech třetin?")) {
+                for (let i = 1; i <= 6; i++) {
+                    const el = document.getElementById('txt-' + i);
+                    if (el) {
+                        el.innerHTML = defaultTexts[i - 1]; // Vrátí výchozí text z pole defaultTexts
+                        el.style.fontSize = "24pt";        // Resetuje velikost písma na 24pt
+                    }
+                }
+            }
+        }
+
     </script>
 
 </body>
