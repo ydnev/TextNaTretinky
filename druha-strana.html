@@ -141,32 +141,16 @@
         .third {
             height: 280.63pt;
             box-sizing: border-box;
-            position: relative;
-            padding: 0.9cm 1cm;
+            border-bottom: 1px dashed #bbb;
+            padding: 15pt;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
         }
 
-        .third::before {
-            content: '';
-            position: absolute;
-            left: 0.5cm;
-            right: 0.5cm;
-            top: 0.5cm;
-            bottom: 0.5cm;
-            border: 1px dashed #bbb;
-            pointer-events: none;
-            /* aby to neblokovalo klikání/psaní do textu */
-        }
-
-        .third:first-child::before {
-            top: 0.5cm;
-        }
-
-        .third:last-child::before {
-            bottom: 0.5cm;
+        .third:last-child {
+            border-bottom: none;
         }
 
         /* Hlavní stylování textu */
@@ -186,6 +170,7 @@
         .content * {
             font-size: inherit !important;
             font-family: inherit !important;
+            text-align: inherit !important;
         }
 
         /* PRAVIDLA PRO TISK */
@@ -224,29 +209,13 @@
 
             /* Čáry mezi třetinami se nyní PONECHÁVAJÍ i v tisku */
             .third {
-                position: relative;
+                border-bottom: 1px dashed #bbb;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+            }
 
-                .third::before {
-                    content: '';
-                    position: absolute;
-                    left: 0.5cm;
-                    right: 0.5cm;
-                    top: 0.5cm;
-                    bottom: 0.5cm;
-                    border: 1px dashed #bbb;
-                    pointer-events: none;
-                    /* aby to neblokovalo klikání/psaní do textu */
-                }
-
-                .third:first-child::before {
-                    top: 0.5cm;
-                }
-
-                .third:last-child::before {
-                    bottom: 0.5cm;
-                }
+            .third:last-child {
+                border-bottom: none;
             }
         }
     </style>
@@ -417,6 +386,7 @@
                 const allElements = tempDiv.querySelectorAll('*');
                 allElements.forEach(el => {
                     el.style.fontSize = ''; // Odstraní inline nastavení velikosti
+                    el.style.textAlign = '';
                     el.style.fontFamily = ''; // Odstraní inline nastavení fontu
                     el.style.lineHeight = ''; // Odstraní případné řádkování
                 });
